@@ -23,7 +23,7 @@ Edit files and run `npm run check` to get the TypeScript compiler to check files
 [x] Simple hashing function to turn a string into an integer
 [x] Class for Hashmap that wraps existing JavaScript code that handles Hash Tables
 [x] Set of tests for the Hashmap API
-[ ] Implementing simple Hashmap in own code with fixed size
+[x] Implementing simple Hashmap in own code with fixed size
 [ ] Rehashing / changing the size of the Hashmap dynamically
 
 ## License
