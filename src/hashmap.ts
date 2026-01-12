@@ -8,33 +8,39 @@ import { sdbm } from './utils'
  * We calculate the bucket to store the key/value pair
  * using a hash function to compute the 'index' and
  * use modulo % to ensure the index is somewhere in our array
- * of buckets
- * 
+ * of buckets.
+ *
  * This methodology trades 'space' by keeping the size of the table
  * fixed vs 'time' to look items up.
- * 
- * The worst case scenario is that we keep adding items and they 
+ *
+ * The computeKeyIndex function is approx 0(n) + O(1), so this adds a loop each time
+ * we get / set a key.  The function may affect distribution because we don't
+ * take the modulo into account when generating the hash, just the index,
+ * but it does distribute fairly evenly across the numeric range.
+ * See the sdbm function for more of an explanation of it's internals.
+ *
+ * The worst case scenario is that we keep adding items and they
  * all end up in the same bucket, so the time to add and lookup
  * key/value pairs is <= ~O(2n) where n is the number of items in the hashmap
  * because we compute the index - assuming O(1) for this operation, then
- * loop through all of the items in the index looking for a key/pair - 
+ * loop through all of the items in the index looking for a key/pair -
  * two statements * the number of items...,
- * 
- * 
+ *
  * Getting all of the values or keys requires a double loop, which has a complexity
  * of O(n^2) because we don't restrict the number of items in the hashmap to a fixed
  * number.
- * 
+ *
  * To improve this Hashmap, we should consider the 'load factor' which is the ratio
  * of the number of elements / number of buckets n/M.  As the number of items grows
  * we should grow the number of buckets so we distribute items more 'evenly' across
- * each bucket
+ * each bucket.
  * This means that lookup would speed up because we would derive the index, then
  * loop less. An ideal load factor is < 1, so we would ideally have one item in
  * each bucket.
- * 
+ *
  * Next step would be to implement 'rehashing' where we 'grow' the number of buckets
- * and move the key/value pairs around when we reach a certain size.
+ * and move the key/value pairs around when we reach a certain size and also
+ * do tests for distribution and performance.
  * */ 
 
 export class SimpleHashMap {
@@ -112,6 +118,9 @@ export class SimpleHashMap {
 
   private computeKeyIndex(key: any): number {
     const keyStr = key.toString()
-    return Math.abs(sdbm(keyStr)) % this._size
+    // sdbm returns a 'signed' number, so shift it
+    // one place to the right and get the absolute
+    // to retain 'distribution'
+    return (Math.abs(sdbm(keyStr) << 1)) % this._size
   }
 }
